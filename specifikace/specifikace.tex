@@ -1,0 +1,29 @@
+\chyph
+\parskip=0.3cm
+\parindent=0pt
+
+{\bf Interaktivní playlist} (Jakub Maroušek, Jakub Hančin)
+
+Cílem našeho projektu je vyrobit aplikaci pro přehrávání hudby s 2D grafickým
+playlistem, v němž budou skladby seřazené podle jejich hudebních vlastností,
+jako je např. tempo, dynamika, \uv{tancovatelnost}, apod.
+
+Základem aplikace je vylepšený extraktor příznaků ze skladeb, který bude
+vytvořený na základě některé volně dostupné knihovny pro extrakci.
+Nízkoúrovňové příznaky (energy, magnitude spectrum, spectral flux apod.), které
+nám knihovna extrahuje, budeme upravovat, aby nám vznikly vysokoúrovňové
+vlastnosti, které už půjdou přímo v programu využít.
+
+Samotná aplikace bude grafická a bude mít schopnost přijmout nové hudební
+soubory, přidat je do databáze a spustit extrakci vlastností. Playlist je
+čtvercová plocha se dvěma osami, z nichž každá reprezentuje jeden příznak (to
+si může zvolit uživatel). Na ploše se zobrazují skladby náhodně vybrané z
+databáze a umístěné podle hodnoty příznaků. Skladby se v playlistu v čase
+střídají.
+
+Počet implementovaných příznaků nemůžeme dopředu slíbit, závisí na naší
+schopnosti je efektivně extrahovat. Použité technologie zatím nejsou vybrané,
+chceme si nejdřív zjistit, které příznaky budeme pro extrakci potřebovat, a na
+základě toho vybrat knihovnu.
+
+\bye
