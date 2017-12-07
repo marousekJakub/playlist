@@ -1,0 +1,50 @@
+#:kivy 1.9.0
+#
+
+<Controller>:
+    canvas.before:
+        Rectangle:
+            source: '/home/kuba/playlist/src/party.jpg'
+            pos: self.center_x-2*500, self.center_y-2*300
+            size: 2*1200, 2*600
+    on_size: root.playlist_resized(args)
+
+    BoxLayout:
+        orientation: 'vertical'
+
+        StackLayout:
+            orientation: 'tb-lr'
+            size_hint_y: None
+            height: 40
+            canvas.before:
+                Color:
+                    rgba: 0, 0, 0.5, 0.6
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+
+            Button:
+                text: 'Přidat nové skladby'
+                size: self.texture_size[0] + 20, self.texture_size[1]
+                size_hint_x: None
+                on_press: root.playlist_resized()
+                on_size: root.playlist_resized(args)
+            
+            Button:
+                text: 'Správce skladeb'
+                size: self.texture_size[0] + 20, self.texture_size[1]
+                size_hint_x: None
+
+        ProgressBar:
+            max: 100
+            value: 50
+            size_hint_y: None
+            height: 5
+
+        FloatLayout:
+            
+        
+        TextInput:
+            multiline: False
+            size_hint_y: None
+            height: self.font_size + 15
