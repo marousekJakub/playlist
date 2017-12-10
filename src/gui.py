@@ -108,7 +108,7 @@ class MenuBar(StackLayout):
         self.orientation = 'tb-lr'
         self.size_hint_y = None
         self.height = 40
-        self.bind(size=self.set_background)
+        self.bind(size=self.set_background, pos=self.set_background)
     
     def set_background(self, *args):
         self.canvas.before.clear()
