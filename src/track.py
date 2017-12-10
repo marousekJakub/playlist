@@ -16,7 +16,7 @@ class TrackRepo:
         raise NotImplementedError("This class cannot be used separately")
     
     def get_random_songs(self, num, feature_constraints):
-        raise NotImplementedError()
+        raise NotImplementedError
 
 
 class SqliteTrackRepo(TrackRepo):
@@ -26,19 +26,26 @@ class SqliteTrackRepo(TrackRepo):
         self.cursor = self.conn.cursor()
     
     def init_tables(self):
-        self.cursor.execute(""" CREATE TABLE tracks (
-            track_id INTEGER PRIMARY KEY NOT NULL,
-            track_name VARCHAR(100) NOT NULL,
-            artist_id VARCHAR(100) NOT NULL,
-            file_path VARCHAR(100) NOT NULL
-        )""")
-           
         self.cursor.execute(""" CREATE TABLE artists (
             artist_id INTEGER PRIMARY KEY NOT NULL,
-            artist_name VARCHAR(100) NOT NULL UNIQUE
+            artist_name TEXT NOT NULL UNIQUE
+        )""")
+
+        self.cursor.execute(""" CREATE TABLE tracks (
+            track_id INTEGER PRIMARY KEY NOT NULL,
+            artist_id INTEGER NOT NULL REFERENCES artists(artist_id),
+            track_name TEXT NOT NULL,
+            file_path TEXT NOT NULL
+        )""")
+           
+        self.cursor.execute(""" CREATE TABLE feature_names (
+            feature_id INTEGER PRIMARY KEY NOT NULL,
+            feature_name TEXT NOT NULL UNIQUE
         )""")
 
         self.cursor.execute(""" CREATE TABLE features (
-            feature_id INTEGER PRIMARY KEY NOT NULL,
-            feature_name VARCHAR(30) NOT NULL UNIQUE
+            id INTEGER PRIMARY KEY NOT NULL,
+            feature_id INTEGER NOT NULL REFERENCES feature_names(feature_id),
+            track_id INTEGER NOT NULL REFERENCES tracks(track_id),
+            value FLOAT NOT NULL
         )""")
