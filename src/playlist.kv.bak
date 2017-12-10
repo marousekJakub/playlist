@@ -1,13 +1,41 @@
 #:kivy 1.9.0
-#
+#:set track_info_width 150
+#:set track_info_height 50
+#:import NumericProperty kivy.properties.NumericProperty
 
-<Controller>:
+<TrackInfo@BoxLayout>
+    orientation: 'vertical'
+    size_hint_x: None
+    size_hint_y: None
+    canvas.before:
+        Color:
+            rgba: 0.5, 0.5, 0.5, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    
+    Label:
+        text: 'ahoj'
+        halign: 'left'
+        width: track_info_width - 10
+        text_size: track_info_width - 20, None
+    Label:
+        text: 'behoj'
+        halign: 'left'
+        width: track_info_width - 10
+        text_size: track_info_width - 20, None
+        bold: True
+
+<Playlist@FloatLayout>:
+    track_info_width: track_info_width
+    track_info_height: track_info_height
+
+<RootLayout@FloatLayout>:
     canvas.before:
         Rectangle:
-            source: '/home/kuba/playlist/src/party.jpg'
+            source: '/home/kuba/playlist2/src/party.jpg'
             pos: self.center_x-2*500, self.center_y-2*300
             size: 2*1200, 2*600
-    on_size: root.playlist_resized(args)
 
     BoxLayout:
         orientation: 'vertical'
@@ -27,8 +55,6 @@
                 text: 'Přidat nové skladby'
                 size: self.texture_size[0] + 20, self.texture_size[1]
                 size_hint_x: None
-                on_press: root.playlist_resized()
-                on_size: root.playlist_resized(args)
             
             Button:
                 text: 'Správce skladeb'
@@ -41,8 +67,10 @@
             size_hint_y: None
             height: 5
 
-        FloatLayout:
-            
+        Playlist:
+            id: playlist
+            track_info_width: track_info_width
+            track_info_height: track_info_height
         
         TextInput:
             multiline: False
