@@ -11,7 +11,7 @@ from kivy.properties import StringProperty, NumericProperty
 from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.textinput import TextInput
-from math import floor
+from math import floor, ceil
 
 class TrackInfoLabel(Label):
     def __init__(self, track_info, **kwargs):
@@ -59,9 +59,7 @@ class Playlist(FloatLayout):
         self.widget_positions = {}
     
     def size_update(self, *size):
-        print("updating size")
-        self.clear_widgets()
-        self.widget_positions.clear()
+        self._unregister_widgets()
         if self.elem_width == 0 or self.elem_height == 0:
             self._cols = self._rows = 0
             self._cell_width = self._cell_height = 0
@@ -75,15 +73,37 @@ class Playlist(FloatLayout):
                 self._cell_width = self._cell_height = 0
 
     def place_widget(self, col, row, widget):
+        self._register_widget(col, row, widget)
+        widget.center_x = self.x + (col+0.5) * self._cell_width
+        widget.center_y = self.y + (row+0.5) * self._cell_height
+        self.add_widget(widget)
+
+    def _register_widget(self, col, row, widget):
         if not ( (0 <= col < self._cols) and (0 <= row <= self._rows) ):
             raise Exception("Attempt to place widget at non-existent position %d, %d" % (col, row))
         elif (col, row) in self.widget_positions:
-            raise Exception("Attemp to place widget to occupied position %d %d" % (col, row))
+            raise Exception("Attempt to place widget to occupied position %d %d" % (col, row))
         else:
-            widget.center_x = self.x + (col+0.5) * self._cell_width
-            widget.center_y = self.y + (row+0.5) * self._cell_height
-            self.add_widget(widget)
             self.widget_positions[(col, row)] = widget
+    
+    def _unregister_widgets(self):
+        self.clear_widgets()
+        self.widget_positions.clear()
+    
+    def place_widget_central(self, widget):
+        # central place in the playlist occupies a single column (if num_cols is odd)
+        # or two columns in the middle (if num_cols is even)
+        # the same for rows
+        cols1 = (self._cols - 1) / 2.0
+        rows1 = (self._rows - 1) / 2.0
+        med_cols = range(int(cols1), int(ceil(cols1)) + 1)
+        med_rows = range(int(rows1), int(ceil(rows1)) + 1)
+        for col in med_cols:
+            for row in med_rows:
+                self._register_widget(col, row, widget)
+        
+        widget.center = self.center
+        self.add_widget(widget)
     
     def is_widget_placed(self, col, row):
         return (col, row) in self.widget_positions

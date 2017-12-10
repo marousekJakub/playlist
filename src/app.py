@@ -12,11 +12,13 @@ class PlaylistApp(App):
     
     def place_test_widgets(self, *args):
         p = self.root.playlist
-        print(p.num_rows(), p.num_cols())
+        
         if p.num_rows() > 0 and p.num_cols() > 0:
+            p.place_widget_central(TrackInfo(track_artist="artist", track_name="central"))
             for col in range(p.num_cols()):
                 for row in range(p.num_rows()):
-                    p.place_widget(col, row, TrackInfo(track_artist="artist", track_name="name"))
+                    if not p.is_widget_placed(col, row):
+                        p.place_widget(col, row, TrackInfo(track_artist="artist", track_name="at %d %d" % (col, row)))
 
 
 if __name__ == '__main__':
