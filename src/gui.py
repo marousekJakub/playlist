@@ -25,8 +25,7 @@ class TrackInfoLabel(Label):
 
 
 class TrackInfo(BoxLayout):
-    track_artist = StringProperty()
-    track_name = StringProperty()
+    track = ObjectProperty()
     
     def __init__(self, **kwargs):
         super(TrackInfo, self).__init__(**kwargs)
@@ -36,8 +35,8 @@ class TrackInfo(BoxLayout):
         self.size_hint = (None, None)
         self.bind(pos=self.set_background)
         
-        self.add_widget(TrackInfoLabel(self, text=self.track_artist))
-        self.add_widget(TrackInfoLabel(self, text=self.track_name))
+        self.add_widget(TrackInfoLabel(self, text=self.track.artist))
+        self.add_widget(TrackInfoLabel(self, text=self.track.name))
     
     def set_background(self, *args):
         self.canvas.before.clear()
