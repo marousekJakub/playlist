@@ -64,19 +64,26 @@ class Playlist(FloatLayout):
 
     def __init__(self, **kwargs):
         super(Playlist, self).__init__(**kwargs)
-        self.bind(size=self.size_update, feature_x=self.feature_update, feature_y=self.feature_update)
-        self.widget_positions = {}
         self.label_x_low = PlaylistLabel()
         self.label_x_high = PlaylistLabel()
         self.label_y_low = PlaylistLabel()
         self.label_y_high = PlaylistLabel()
-        self.feature_update()
+        self.widget_positions = {}
+
+        self.bind(size=self.cells_reset, feature_x=self.cells_reset, feature_y=self.cells_reset)
+        self.bind(feature_x=self.labels_text_update, feature_y=self.labels_text_update)
+        self.label_x_low.bind(texture_size=self.labels_pos_update)
+        self.label_x_high.bind(texture_size=self.labels_pos_update)
+        self.label_y_low.bind(texture_size=self.labels_pos_update)
+        self.label_y_high.bind(texture_size=self.labels_pos_update)
+        self.bind(size=self.labels_pos_update, pos=self.labels_pos_update)
+
         self.add_widget(self.label_x_low)
         self.add_widget(self.label_x_high)
         self.add_widget(self.label_y_low)
         self.add_widget(self.label_y_high)
     
-    def size_update(self, *size):
+    def cells_reset(self, *size):
         self.canvas.before.clear()
         with self.canvas.before:
             Color(rgba=(1,1,1,1))
@@ -96,6 +103,17 @@ class Playlist(FloatLayout):
             else:
                 self._cell_width = self._cell_height = 0
         
+    def labels_text_update(self, *size):
+        print("text update")
+        if self.feature_x is not None and self.feature_y is not None:
+            self.label_x_low.text = self.feature_x.low_readable
+            self.label_x_high.text = self.feature_x.high_readable
+            self.label_y_low.text = self.feature_y.low_readable
+            self.label_y_high.text = self.feature_y.high_readable
+    
+    def labels_pos_update(self, *args):
+        print("pos update")
+        print(self.label_x_low.texture_size)
         self.label_x_low.x = self.x + self.label_x_low.texture_size[0]/2 + 10
         self.label_x_low.y = self.center_y - 15
 
@@ -108,12 +126,6 @@ class Playlist(FloatLayout):
         self.label_y_high.x = self.center_x + self.label_y_low.texture_size[0]/2 + 10
         self.label_y_high.y = self.y + self.height - self.label_y_high.texture_size[1]/2 - 5
     
-    def feature_update(self, *args):
-        self.label_x_low.text = self.feature_x.low_readable
-        self.label_x_high.text = self.feature_x.high_readable
-        self.label_y_low.text = self.feature_y.low_readable
-        self.label_y_high.text = self.feature_y.high_readable
-
     def place_widget(self, col, row, widget):
         self._register_widget(col, row, widget)
         widget.center_x = self.x + (col+0.5) * self._cell_width
@@ -166,13 +178,25 @@ class MenuButton(Button):
 
 
 class FeatureChoose(Spinner):
-    def __init__(self, features, **kwargs):
+    active_feature = ObjectProperty()
+
+    def __init__(self, features, feature_default_num, **kwargs):
         super(FeatureChoose, self).__init__(**kwargs)
-        self.text = features[0].name_readable
+        self.text = features[feature_default_num].name_readable
+
         self.values = [ f.name_readable for f in features ]
-        self.value_objects = features
+        self.feature_objects = features
         self.size_hint_x = None
         self.width = 200
+        self.bind(text=self.update_active_feature)
+        self.update_active_feature()
+    
+    def update_active_feature(self, *args):
+        for feature in self.feature_objects:
+            if feature.name_readable == self.text:
+                self.active_feature = feature
+                return
+        assert False
 
 
 class FeatureChooseLabel(Label):
@@ -212,11 +236,11 @@ class RootLayout(BoxLayout):
         self.show_tracks = MenuButton(text=u"Správce skladeb")
         self.menu_bar = MenuBar()
         self.progress_bar = ProgressBar(max=100, value=50, size_hint_y=None, height=5)
-        self.playlist = Playlist(elem_width=160, elem_height=60, feature_x=features[0], feature_y=features[1])
+        self.playlist = Playlist(elem_width=160, elem_height=60)
         self.bottom_bar = MenuBar()
         self.search = TextInput(multiline=False)
-        self.choose_x = FeatureChoose(features)
-        self.choose_y = FeatureChoose(features)
+        self.choose_x = FeatureChoose(features, 0)
+        self.choose_y = FeatureChoose(features, 1)
         self.choose_label_x = FeatureChooseLabel(text="X:")
         self.choose_label_y = FeatureChooseLabel(text="Y:")
 

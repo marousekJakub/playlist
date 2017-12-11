@@ -14,9 +14,20 @@ class PlaylistApp(App):
         self.current_track = None
 
     def build(self):
-        self.rl = RootLayout(bg_path='/home/kuba/playlist2/src/party.jpg', features=self.features)
-        # self.rl.playlist.bind(size=self.update_playlist)
-        return self.rl
+        root = RootLayout(bg_path='/home/kuba/playlist2/src/party.jpg', features=self.features)
+        root.choose_x.bind(text=self.update_axes)
+        root.choose_y.bind(text=self.update_axes)
+        return root
+
+    def on_start(self):
+        self.update_axes()
+
+    def update_axes(self, *args):
+        feature_x = self.root.choose_x.active_feature
+        feature_y = self.root.choose_y.active_feature
+        self.root.playlist.feature_x = feature_x
+        self.root.playlist.feature_y = feature_y
+
         
 class Feature:
     def __init__(self, name, name_readable, low_readable, high_readable):
