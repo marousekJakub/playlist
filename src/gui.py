@@ -6,8 +6,8 @@ from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.stacklayout import StackLayout
 from kivy.uix.progressbar import ProgressBar
-from kivy.graphics import Color, Rectangle
-from kivy.properties import StringProperty, NumericProperty
+from kivy.graphics import Color, Rectangle, Line
+from kivy.properties import StringProperty, NumericProperty, ObjectProperty
 from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.textinput import TextInput
@@ -49,6 +49,8 @@ class TrackInfo(BoxLayout):
 class Playlist(FloatLayout):
     elem_width = NumericProperty()
     elem_height = NumericProperty()
+    feature_x = ObjectProperty()
+    feature_y = ObjectProperty()
     _cols = NumericProperty()
     _rows = NumericProperty()
     _cell_width = NumericProperty()
@@ -60,6 +62,12 @@ class Playlist(FloatLayout):
         self.widget_positions = {}
     
     def size_update(self, *size):
+        self.canvas.before.clear()
+        with self.canvas.before:
+            Color(rgba=(1,1,1,1))
+            Line(points=[self.x, self.center_y, self.x + self.width, self.center_y])
+            Line(points=[self.center_x, self.y, self.center_x, self.y + self.height])
+
         self._unregister_widgets()
         if self.elem_width == 0 or self.elem_height == 0:
             self._cols = self._rows = 0
