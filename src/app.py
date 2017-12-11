@@ -45,18 +45,20 @@ class PlaylistApp(App):
         if self.current_track is None:
             border_x = border_y = 0.5
         
-        for track in self.repo.get_random_tracks(5, []):
+        num_tracks = (playlist.num_cols() * playlist.num_rows()) / 6
+        for track in self.repo.get_random_tracks(num_tracks, []):
             good_x = int(round(track.features[feature_x.name] * (playlist.num_cols()-1)))
             good_y = int(round(track.features[feature_y.name] * (playlist.num_rows()-1)))
             if not playlist.is_widget_placed(good_x, good_y):
                 playlist.place_widget(good_x, good_y, TrackInfo(track=track))
             else:
                 print("bad luck")
+        
+        self.root.progress_bar.value = 100
     
     def update_countdown(self, *args):
         progress_bar = self.root.progress_bar
         if progress_bar.value <= 0:
-            progress_bar.value = 100
             self.update_tracks()
         else:
             progress_bar.value -= 2

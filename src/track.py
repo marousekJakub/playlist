@@ -45,7 +45,7 @@ class SqliteTrackRepo(TrackRepo):
     def get_random_tracks(self, count, feature_constraints):
         q = "SELECT track_id, track_name, file_path, tempo, energy, danceability, artist_name FROM tracks JOIN artists USING(artist_id) ORDER BY RANDOM() LIMIT ?"
         tracks = []
-        for (track_id, track_name, file_path, tempo, energy, danceability, artist_name) in self.cursor.execute(q, str(count)):
+        for (track_id, track_name, file_path, tempo, energy, danceability, artist_name) in self.cursor.execute(q, (str(count),)):
             features = {
                 "energy": energy,
                 "tempo": tempo,
