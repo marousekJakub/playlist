@@ -46,6 +46,12 @@ class TrackInfo(BoxLayout):
             Rectangle(pos=self.pos, size=self.size)
 
 
+class PlaylistLabel(Label):
+    def __init__(self, **kwargs):
+        super(PlaylistLabel, self).__init__(**kwargs)
+        self.size = self.texture_size
+        self.size_hint = (None, None)
+
 class Playlist(FloatLayout):
     elem_width = NumericProperty()
     elem_height = NumericProperty()
@@ -58,8 +64,17 @@ class Playlist(FloatLayout):
 
     def __init__(self, **kwargs):
         super(Playlist, self).__init__(**kwargs)
-        self.bind(size=self.size_update)
+        self.bind(size=self.size_update, feature_x=self.feature_update, feature_y=self.feature_update)
         self.widget_positions = {}
+        self.label_x_low = PlaylistLabel()
+        self.label_x_high = PlaylistLabel()
+        self.label_y_low = PlaylistLabel()
+        self.label_y_high = PlaylistLabel()
+        self.feature_update()
+        self.add_widget(self.label_x_low)
+        self.add_widget(self.label_x_high)
+        self.add_widget(self.label_y_low)
+        self.add_widget(self.label_y_high)
     
     def size_update(self, *size):
         self.canvas.before.clear()
@@ -80,6 +95,24 @@ class Playlist(FloatLayout):
                 self._cell_height = int(floor(self.height / self._rows))
             else:
                 self._cell_width = self._cell_height = 0
+        
+        self.label_x_low.x = self.x + self.label_x_low.texture_size[0]/2 + 10
+        self.label_x_low.y = self.center_y - 15
+
+        self.label_x_high.x = self.x + self.width - self.label_x_low.texture_size[0]/2 - 10
+        self.label_x_high.y = self.center_y + 15
+
+        self.label_y_low.x = self.center_x - self.label_y_low.texture_size[0]/2 - 10
+        self.label_y_low.y = self.y + self.label_y_low.texture_size[1]/2 + 5
+
+        self.label_y_high.x = self.center_x + self.label_y_low.texture_size[0]/2 + 10
+        self.label_y_high.y = self.y + self.height - self.label_y_high.texture_size[1]/2 - 5
+    
+    def feature_update(self, *args):
+        self.label_x_low.text = self.feature_x.low_readable
+        self.label_x_high.text = self.feature_x.high_readable
+        self.label_y_low.text = self.feature_y.low_readable
+        self.label_y_high.text = self.feature_y.high_readable
 
     def place_widget(self, col, row, widget):
         self._register_widget(col, row, widget)
@@ -96,7 +129,8 @@ class Playlist(FloatLayout):
             self.widget_positions[(col, row)] = widget
     
     def _unregister_widgets(self):
-        self.clear_widgets()
+        for widget in self.widget_positions.values():
+            self.remove_widget(widget)
         self.widget_positions.clear()
     
     def place_widget_central(self, widget):
@@ -178,7 +212,7 @@ class RootLayout(BoxLayout):
         self.show_tracks = MenuButton(text=u"Správce skladeb")
         self.menu_bar = MenuBar()
         self.progress_bar = ProgressBar(max=100, value=50, size_hint_y=None, height=5)
-        self.playlist = Playlist(elem_width=160, elem_height=60)
+        self.playlist = Playlist(elem_width=160, elem_height=60, feature_x=features[0], feature_y=features[1])
         self.bottom_bar = MenuBar()
         self.search = TextInput(multiline=False)
         self.choose_x = FeatureChoose(features)
