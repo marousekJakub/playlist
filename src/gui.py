@@ -11,6 +11,7 @@ from kivy.properties import StringProperty, NumericProperty
 from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.textinput import TextInput
+from kivy.uix.spinner import Spinner
 from math import floor, ceil
 
 class TrackInfoLabel(Label):
@@ -122,6 +123,23 @@ class MenuButton(Button):
         self.width = 200
 
 
+class FeatureChoose(Spinner):
+    def __init__(self, features, **kwargs):
+        super(FeatureChoose, self).__init__(**kwargs)
+        self.text = features[0].name_readable
+        self.values = [ f.name_readable for f in features ]
+        self.value_objects = features
+        self.size_hint_x = None
+        self.width = 200
+
+
+class FeatureChooseLabel(Label):
+    def __init__(self, **kwargs):
+        super(FeatureChooseLabel, self).__init__(**kwargs)
+        self.size_hint_x = None
+        self.width = self.texture_size[0] + 40
+
+
 class MenuBar(StackLayout):
     def __init__(self, **kwargs):
         super(MenuBar, self).__init__(**kwargs)
@@ -138,7 +156,7 @@ class MenuBar(StackLayout):
 
 
 class RootLayout(BoxLayout):
-    def __init__(self, **kwargs):
+    def __init__(self, features, **kwargs):
         self.bg_path = None
         if "bg_path" in kwargs:
             self.bg_path = kwargs["bg_path"]
@@ -153,16 +171,27 @@ class RootLayout(BoxLayout):
         self.menu_bar = MenuBar()
         self.progress_bar = ProgressBar(max=100, value=50, size_hint_y=None, height=5)
         self.playlist = Playlist(elem_width=160, elem_height=60)
-        self.search = TextInput(multiline=False, size_hint_y=None)
+        self.bottom_bar = MenuBar()
+        self.search = TextInput(multiline=False)
+        self.choose_x = FeatureChoose(features)
+        self.choose_y = FeatureChoose(features)
+        self.choose_label_x = FeatureChooseLabel(text="X:")
+        self.choose_label_y = FeatureChooseLabel(text="Y:")
 
         self.search.height = self.search.font_size + 15
 
         self.menu_bar.add_widget(self.add_track)
         self.menu_bar.add_widget(self.show_tracks)
+        self.bottom_bar.add_widget(self.choose_label_x)
+        self.bottom_bar.add_widget(self.choose_x)
+        self.bottom_bar.add_widget(self.choose_label_y)
+        self.bottom_bar.add_widget(self.choose_y)
+        self.bottom_bar.add_widget(self.search)
         self.add_widget(self.menu_bar)
         self.add_widget(self.progress_bar)
         self.add_widget(self.playlist)
-        self.add_widget(self.search)
+        self.add_widget(self.bottom_bar)
+
     
     def set_background(self, *args):
         if self.bg_path is not None:
