@@ -7,7 +7,7 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.stacklayout import StackLayout
 from kivy.uix.progressbar import ProgressBar
 from kivy.graphics import Color, Rectangle, Line
-from kivy.properties import StringProperty, NumericProperty, ObjectProperty
+from kivy.properties import StringProperty, NumericProperty, ObjectProperty, BooleanProperty
 from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.textinput import TextInput
@@ -26,6 +26,10 @@ class TrackInfoLabel(Label):
 
 class TrackInfo(BoxLayout):
     track = ObjectProperty()
+    is_active = BooleanProperty(False)
+
+    rgba_inactive = (0.5, 0.5, 0.5, 1)
+    rgba_active   = (0.5, 0.5, 0.8, 1)
     
     def __init__(self, **kwargs):
         super(TrackInfo, self).__init__(**kwargs)
@@ -34,14 +38,16 @@ class TrackInfo(BoxLayout):
         self.height = 50
         self.size_hint = (None, None)
         self.bind(pos=self.set_background)
+        self.bind(is_active=self.set_background)
         
         self.add_widget(TrackInfoLabel(self, text=self.track.artist))
         self.add_widget(TrackInfoLabel(self, text=self.track.name))
     
     def set_background(self, *args):
         self.canvas.before.clear()
+        rgba = self.rgba_active if self.is_active else self.rgba_inactive
         with self.canvas.before:
-            Color(rgba=(0.5, 0.5, 0.5, 1))
+            Color(rgba=rgba)
             Rectangle(pos=self.pos, size=self.size)
 
 

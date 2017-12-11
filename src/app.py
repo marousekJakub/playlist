@@ -12,7 +12,7 @@ class PlaylistApp(App):
         super(PlaylistApp, self).__init__()
         self.repo = track_repo
         self.features = features
-        self.current_track = None
+        self.current_track_info = None
 
     def build(self):
         root = RootLayout(bg_path='/home/kuba/playlist2/src/party.jpg', features=self.features)
@@ -42,17 +42,21 @@ class PlaylistApp(App):
 
         feature_x = self.root.playlist.feature_x
         feature_y = self.root.playlist.feature_y
-        if self.current_track is None:
+        if self.current_track_info is None:
             border_x = border_y = 0.5
+        else:
+            playlist.place_widget_central(self.current_track_info)
         
         num_tracks = (playlist.num_cols() * playlist.num_rows()) / 6
         for track in self.repo.get_random_tracks(num_tracks, []):
             good_x = int(round(track.features[feature_x.name] * (playlist.num_cols()-1)))
             good_y = int(round(track.features[feature_y.name] * (playlist.num_rows()-1)))
             if not playlist.is_widget_placed(good_x, good_y):
-                playlist.place_widget(good_x, good_y, TrackInfo(track=track))
+                tr = TrackInfo(track=track)
+                tr.bind(on_touch_up=self.track_chosen)
+                playlist.place_widget(good_x, good_y, tr)
             else:
-                print("bad luck")
+                pass # TODO
         
         self.root.progress_bar.value = 100
     
@@ -62,6 +66,12 @@ class PlaylistApp(App):
             self.update_tracks()
         else:
             progress_bar.value -= 2
+    
+    def track_chosen(self, track_info, event):
+        if track_info.collide_point(event.x, event.y):
+            self.current_track_info = track_info
+            track_info.is_active = True
+            self.update_tracks()
 
         
 class Feature:
