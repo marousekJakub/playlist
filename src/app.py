@@ -4,6 +4,7 @@
 from kivy.app import App
 from gui import TrackInfo, RootLayout
 from track import Track, SqliteTrackRepo
+from kivy.clock import Clock
 
 
 class PlaylistApp(App):
@@ -25,6 +26,7 @@ class PlaylistApp(App):
     def on_start(self):
         self.update_axes()
         self.update_tracks()
+        Clock.schedule_interval(self.update_countdown, 1/10.0)
 
     def update_axes(self, *args):
         feature_x = self.root.choose_x.active_feature
@@ -33,8 +35,8 @@ class PlaylistApp(App):
         self.root.playlist.feature_y = feature_y
     
     def update_tracks(self, *args):
-        # here, we pretend all TrackInfos from the playlist have been already removed
         playlist = self.root.playlist
+        playlist.cells_reset()
         if playlist.num_cols() == 0 or playlist.num_rows() == 0:
             return
 
@@ -50,6 +52,14 @@ class PlaylistApp(App):
                 playlist.place_widget(good_x, good_y, TrackInfo(track=track))
             else:
                 print("bad luck")
+    
+    def update_countdown(self, *args):
+        progress_bar = self.root.progress_bar
+        if progress_bar.value <= 0:
+            progress_bar.value = 100
+            self.update_tracks()
+        else:
+            progress_bar.value -= 2
 
         
 class Feature:

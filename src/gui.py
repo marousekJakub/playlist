@@ -234,7 +234,7 @@ class RootLayout(BoxLayout):
         self.add_track = MenuButton(text=u"Přidat novou skladbu")
         self.show_tracks = MenuButton(text=u"Správce skladeb")
         self.menu_bar = MenuBar()
-        self.progress_bar = ProgressBar(max=100, value=50, size_hint_y=None, height=5)
+        self.progress_bar = ProgressBar(max=100, value=100, size_hint_y=None, height=5)
         self.playlist = Playlist(elem_width=160, elem_height=60)
         self.bottom_bar = MenuBar()
         self.search = TextInput(multiline=False)
