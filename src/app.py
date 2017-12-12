@@ -132,4 +132,4 @@ standard_features = [
 ]
 
 if __name__ == '__main__':
-    PlaylistApp(SqliteTrackRepo("db2.sqlite"), standard_features).run()
+    PlaylistApp(SqliteTrackRepo("db.sqlite"), standard_features).run()
