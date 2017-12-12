@@ -42,11 +42,21 @@ class SqliteTrackRepo(TrackRepo):
         self.min_max = { "tempo": (res[0], res[1]), "energy": (res[2], res[3]), "danceability": (res[4], res[5]) }
 
     # feature_constraints is array of tuples eg. ("energy", "<", 3.4)
+    # warning: the feature name and the operator is protected against SQL Injection!
     def get_random_tracks(self, count, feature_constraints):
-        constr_q = " AND ".join([ "%s %s ?" % (c[0], c[1]) for c in feature_constraints])
+
+        # relative constraints to absolute
+        abs_constraints = feature_constraints[:]
+        for constr_num in range(len(abs_constraints)):
+            feat_name, operator, value = abs_constraints[constr_num]
+            if feat_name.startswith("rel_"):
+                abs_name = feat_name[4:]
+                abs_constraints[constr_num] = (abs_name, operator, self.abs_feature(abs_name, value))
+
+        constr_q = " AND ".join([ "%s %s ?" % (c[0], c[1]) for c in abs_constraints])
         if constr_q != "":
             constr_q = "WHERE "+constr_q
-        constr_vals = [ c[2] for c in feature_constraints ]
+        constr_vals = [ c[2] for c in abs_constraints ]
 
         q = """SELECT track_id, track_name, file_path, tempo, energy, danceability, artist_name
         FROM tracks
@@ -72,6 +82,10 @@ class SqliteTrackRepo(TrackRepo):
     def rel_feature(self, feature_name, abs_value):
         mmin, mmax = self.min_max[feature_name]
         return (abs_value-mmin) / (mmax-mmin)
+
+    def abs_feature(self, feature_name, rel_value):
+        mmin, mmax = self.min_max[feature_name]
+        return mmin + rel_value * (mmax-mmin)
 
     @staticmethod
     def init_tables(db_file):
