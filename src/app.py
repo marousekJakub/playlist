@@ -47,15 +47,31 @@ class PlaylistApp(App):
         if self.current_track_info is None:
             center_x = center_y = 0.5
         else:
-            center_x = self.current_track_info.features[feature_x]
-            center_y = self.current_track_info.features[feature_y]
+            center_x = self.current_track_info.track.features[feature_x.name]
+            center_y = self.current_track_info.track.features[feature_y.name]
             playlist.place_widget_central(self.current_track_info)
         
         # get the tracks
         num_tracks = (playlist.num_cols() * playlist.num_rows()) / 6
         for track in self.repo.get_random_tracks(num_tracks, []):
-            good_x = int(round(track.features[feature_x.name] * (playlist.num_cols()-1)))
-            good_y = int(round(track.features[feature_y.name] * (playlist.num_rows()-1)))
+
+            feat_val_x = track.features[feature_x.name]
+            feat_val_y = track.features[feature_y.name]
+            if 0 <= feat_val_x < center_x:
+                good_x = feat_val_x/(2.0*center_x) if center_x != 0 else 0
+            elif center_x <= feat_val_x <= 1:
+                good_x = (feat_val_x-center_x)/(2.0-2*center_x) + 0.5 if center_x != 1 else 1
+            else:
+                assert False
+            if 0 <= feat_val_y < center_y:
+                good_y = feat_val_y/(2.0*center_y) if center_y != 0 else 0
+            elif center_y <= feat_val_y <= 1:
+                good_y = (feat_val_y-center_y)/(2.0-2*center_y) + 0.5 if center_y != 1 else 1
+            else:
+                assert False
+            
+            good_x = int(round(good_x * (playlist.num_cols()-1)))
+            good_y = int(round(good_y * (playlist.num_rows()-1)))
             if not playlist.is_widget_placed(good_x, good_y):
                 tr = TrackInfo(track=track)
                 tr.bind(on_touch_up=self.track_chosen)
