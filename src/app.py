@@ -2,10 +2,11 @@
 # -*- coding: utf-8 -*-
 
 from kivy.app import App
-from gui import TrackInfo, RootLayout
+from gui import TrackInfo, RootLayout, AudioErrorPopup
 from track import Track, SqliteTrackRepo
 from kivy.clock import Clock
 from kivy.core.audio import SoundLoader
+from kivy.uix.popup import Popup
 
 
 class PlaylistApp(App):
@@ -104,13 +105,17 @@ class PlaylistApp(App):
                     self.current_sound_pos = None
             else:
                 track_info.is_active = True
-                
                 if self.current_sound is not None:
                     self.current_sound.stop()
                     self.current_sound.unload()
                 self.current_sound = SoundLoader.load(track_info.track.file_path)
+                if self.current_sound.length <= 0:
+                    AudioErrorPopup(track_info.track).open()
                 self.current_sound.play()
                 self.update_tracks()
+    
+    def show_play_error_popup(self, track):
+        Popup(title="Chyba při přehrávání", content=Labe)
 
         
 class Feature:

@@ -12,6 +12,7 @@ from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.textinput import TextInput
 from kivy.uix.spinner import Spinner
+from kivy.uix.popup import Popup
 from math import floor, ceil
 
 class TrackInfoLabel(Label):
@@ -268,3 +269,16 @@ class RootLayout(BoxLayout):
         if self.bg_path is not None:
             with self.canvas.before:
                 Rectangle(source=self.bg_path, pos=(self.center_x - 2*500, self.center_y - 2*300), size=(2*1200, 2*600))
+
+
+class AudioErrorPopup(Popup):
+    def __init__(self, track):
+        super(AudioErrorPopup, self).__init__()
+        self.size_hint = (None, None)
+        self.size = (300, 300)
+        self.title = u"Chyba při přehrávání"
+        self.content = Label(
+            text=u"Nelze přehrát skladbu %s: Nastala chyba při přehrávání souboru %s" % (track.name, track.file_path),
+            text_size=(self.size[0] - 40, None),
+            pos=(self.x, self.y)
+        )
