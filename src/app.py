@@ -5,6 +5,7 @@ from kivy.app import App
 from gui import TrackInfo, RootLayout
 from track import Track, SqliteTrackRepo
 from kivy.clock import Clock
+from kivy.core.audio import SoundLoader
 
 
 class PlaylistApp(App):
@@ -13,6 +14,8 @@ class PlaylistApp(App):
         self.repo = track_repo
         self.features = features
         self.current_track_info = None
+        self.current_sound = None
+        self.current_sound_pos = None
 
     def build(self):
         root = RootLayout(bg_path='/home/kuba/playlist2/src/party.jpg', features=self.features)
@@ -91,8 +94,23 @@ class PlaylistApp(App):
     def track_chosen(self, track_info, event):
         if track_info.collide_point(event.x, event.y):
             self.current_track_info = track_info
-            track_info.is_active = True
-            self.update_tracks()
+            if track_info.is_active:
+                if self.current_sound.state == "play":
+                    self.current_sound_pos = self.current_sound.get_pos()
+                    self.current_sound.stop()
+                else:
+                    self.current_sound.play()
+                    self.current_sound.seek(self.current_sound_pos)
+                    self.current_sound_pos = None
+            else:
+                track_info.is_active = True
+                
+                if self.current_sound is not None:
+                    self.current_sound.stop()
+                    self.current_sound.unload()
+                self.current_sound = SoundLoader.load(track_info.track.file_path)
+                self.current_sound.play()
+                self.update_tracks()
 
         
 class Feature:
