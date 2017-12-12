@@ -7,6 +7,7 @@ from track import Track, SqliteTrackRepo
 from kivy.clock import Clock
 from kivy.core.audio import SoundLoader
 from kivy.uix.popup import Popup
+from os import path
 
 
 class PlaylistApp(App):
@@ -19,7 +20,7 @@ class PlaylistApp(App):
         self.current_sound_pos = None
 
     def build(self):
-        root = RootLayout(bg_path='/home/kuba/playlist2/src/party.jpg', features=self.features)
+        root = RootLayout(bg_path=path.dirname(path.realpath(__file__))+"/party.jpg", features=self.features)
         root.choose_x.bind(text=self.update_axes)
         root.choose_x.bind(text=self.update_tracks)
         root.choose_y.bind(text=self.update_axes)
