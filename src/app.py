@@ -35,18 +35,23 @@ class PlaylistApp(App):
         self.root.playlist.feature_y = feature_y
     
     def update_tracks(self, *args):
+        # cleanup the playlist
         playlist = self.root.playlist
-        playlist.cells_reset()
         if playlist.num_cols() == 0 or playlist.num_rows() == 0:
             return
+        playlist.cells_reset()
 
+        # select the central feature values, place the central TrackInfo when necessary
         feature_x = self.root.playlist.feature_x
         feature_y = self.root.playlist.feature_y
         if self.current_track_info is None:
-            border_x = border_y = 0.5
+            center_x = center_y = 0.5
         else:
+            center_x = self.current_track_info.features[feature_x]
+            center_y = self.current_track_info.features[feature_y]
             playlist.place_widget_central(self.current_track_info)
         
+        # get the tracks
         num_tracks = (playlist.num_cols() * playlist.num_rows()) / 6
         for track in self.repo.get_random_tracks(num_tracks, []):
             good_x = int(round(track.features[feature_x.name] * (playlist.num_cols()-1)))

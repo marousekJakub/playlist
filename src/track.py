@@ -43,9 +43,20 @@ class SqliteTrackRepo(TrackRepo):
 
     # feature_constraints is array of tuples eg. ("energy", "<", 3.4)
     def get_random_tracks(self, count, feature_constraints):
-        q = "SELECT track_id, track_name, file_path, tempo, energy, danceability, artist_name FROM tracks JOIN artists USING(artist_id) ORDER BY RANDOM() LIMIT ?"
+        constr_q = " AND ".join([ "%s %s ?" % (c[0], c[1]) for c in feature_constraints])
+        if constr_q != "":
+            constr_q = "WHERE "+constr_q
+        constr_vals = [ c[2] for c in feature_constraints ]
+
+        q = """SELECT track_id, track_name, file_path, tempo, energy, danceability, artist_name
+        FROM tracks
+        JOIN artists USING(artist_id)
+        %s
+        ORDER BY RANDOM()
+        LIMIT ?""" % constr_q
+        vals = constr_vals + [ str(count) ]
         tracks = []
-        for (track_id, track_name, file_path, tempo, energy, danceability, artist_name) in self.cursor.execute(q, (str(count),)):
+        for (track_id, track_name, file_path, tempo, energy, danceability, artist_name) in self.cursor.execute(q, vals):
             features = {
                 "energy": energy,
                 "tempo": tempo,
